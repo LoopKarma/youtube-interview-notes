@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68.0", "setuptools-scm>=8.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "youtube-helper"
+version = "0.1.0"
+description = "CLI tool to transcribe YouTube videos and generate structured markdown summaries"
+requires-python = ">=3.12"
+dependencies = [
+    "click>=8.1",
+    "yt-dlp>=2024.0",
+    "openai>=1.0",
+    "python-dotenv>=1.0",
+]
+
+[project.scripts]
+youtube-helper = "youtube_helper.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
