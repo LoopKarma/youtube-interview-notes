@@ -29,7 +29,7 @@ def sanitize_filename(name: str) -> str:
     default=".",
     help="Output directory for the markdown file.",
 )
-@click.option("--model", "-m", default="gpt-4o", help="OpenAI model for summarization.")
+@click.option("--model", "-m", default="gpt-5-mini", help="OpenAI model for summarization.")
 @click.option(
     "--mode",
     type=click.Choice(["summary", "lecture"]),

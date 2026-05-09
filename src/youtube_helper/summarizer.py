@@ -97,7 +97,7 @@ PROMPTS = {
 def summarize_transcript(
     transcript_text: str,
     client: OpenAI,
-    model: str = "gpt-4.1",
+    model: str = "gpt-5-mini",
     mode: str = "summary",
 ) -> str:
     """Send transcript to GPT and get structured markdown output for the given mode."""

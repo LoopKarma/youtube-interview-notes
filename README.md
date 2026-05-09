@@ -41,7 +41,7 @@ Writes `<Sanitized_Video_Title>.md` to current dir.
 | Flag | Default | Purpose |
 |------|---------|---------|
 | `-o, --output DIR` | `.` | Output dir for markdown |
-| `-m, --model NAME` | `gpt-4o` | OpenAI model |
+| `-m, --model NAME` | `gpt-5-mini` | OpenAI model |
 | `--mode {summary,lecture}` | `summary` | Output style (see below) |
 | `--max-chunks N` | none | Cap 10-min audio chunks (cost/test control) |
 
@@ -65,7 +65,7 @@ youtube-helper "https://youtu.be/..." --mode lecture
 youtube-helper "https://youtu.be/..." -o ./out --max-chunks 1
 
 # different model
-youtube-helper "https://youtu.be/..." -m gpt-4.1
+youtube-helper "https://youtu.be/..." -m gpt-5
 ```
 
 ## Pipeline
