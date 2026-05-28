@@ -1,3 +1,8 @@
+# Go
+/youtube-helper
+*.test
+*.out
+
 # Python
 __pycache__/
 *.py[cod]

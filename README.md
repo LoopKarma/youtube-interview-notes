@@ -2,6 +2,35 @@
 
 CLI tool. Download YouTube audio, transcribe with Whisper, summarize with GPT into structured markdown.
 
+Two implementations live in this repo: the original **Python** (`src/`) and a **Go** rewrite (`cmd/` + `internal/`). Both expose the same flags and produce identical markdown.
+
+## Go version
+
+Idiomatic Go port modelled on patterns from [umputun/remark42](https://github.com/umputun/remark42): `go-flags` CLI, interface-driven packages so every external dependency (yt-dlp, ffmpeg, the OpenAI API) is mockable, `%w` error wrapping, and co-located table-driven tests.
+
+Needs Go ≥ 1.24, plus `yt-dlp`, `ffmpeg`, `ffprobe` on `PATH`.
+
+```bash
+go build -o youtube-helper ./cmd/youtube-helper   # build
+go test ./...                                      # run the full test suite
+./youtube-helper "https://youtu.be/..." --mode lecture
+```
+
+Layout:
+
+```
+cmd/youtube-helper/   # go-flags entrypoint + wiring
+internal/
+├── app/              # download→transcribe→summarize→write pipeline (interfaces)
+├── downloader/       # yt-dlp + audio cache
+├── transcriber/      # ffmpeg chunking + Whisper + transcript cache
+├── summarizer/       # GPT prompts + structured markdown
+├── openai/           # minimal net/http OpenAI client (httptest-friendly)
+└── runner/           # injectable external-process runner
+```
+
+The Go flags match the Python ones exactly (see the Options table below).
+
 ## Requirements
 
 - Python ≥ 3.12
