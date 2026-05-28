@@ -10,11 +10,11 @@ set -uo pipefail
 #     "works in terminal, fails from Alfred".)
 export PATH="/opt/homebrew/bin:$HOME/.pyenv/shims:$HOME/go/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
-BIN="$HOME/go/bin/youtube-helper"
+BIN="${YT_BIN:-$HOME/go/bin/youtube-helper}"
 OUT_DIR="$HOME/Documents/YouTube Summaries"
 LOG="$OUT_DIR/.last-run.log"
 MODE="${MODE:-summary}"
-URL="${1:-}"
+RAW="${1:-}"
 
 mkdir -p "$OUT_DIR"               # always exists → result location predictable
 : > "$LOG"                        # fresh log each run
@@ -37,10 +37,33 @@ notify() { # subtitle, message, sound  — logfile is the source of truth
 
 fail() { notify "Failed" "$1" "Basso"; log "see full log: $LOG"; open "$LOG" 2>/dev/null; exit 1; }
 
-log "start mode=$MODE url=$URL"
+log "start raw-input=[$RAW]"
 ding "Tink"                       # immediate audible "triggered"
 
-[ -n "$URL" ] || fail "no URL given"
+# --- Resolve input: arg, else clipboard. Then parse optional leading mode.
+INPUT="$RAW"
+[ -n "$INPUT" ] || { INPUT="$(pbpaste)"; log "arg empty → clipboard=[$INPUT]"; }
+case "$INPUT" in
+  lecture\ *) MODE=lecture; INPUT="${INPUT#lecture }";;
+  summary\ *) MODE=summary; INPUT="${INPUT#summary }";;
+esac
+# Strip whitespace, CR and surrounding quotes/angle-brackets.
+URL="$(printf '%s' "$INPUT" | tr -d '\r' | sed -E 's/^[[:space:]"<]+//; s/[[:space:]">]+$//')"
+log "resolved mode=$MODE url=[$URL]"
+
+case "$URL" in
+  http*youtu.be/*|http*youtube.com/*|http*youtube-nocookie.com/*) ;;
+  youtu.be/*|youtube.com/*|www.youtube.com/*|m.youtube.com/*)
+    URL="https://$URL"; log "added scheme → $URL";;
+  *)
+    # bare 11-char video id? build a watch URL.
+    if printf '%s' "$URL" | grep -qE '^[A-Za-z0-9_-]{11}$'; then
+      URL="https://www.youtube.com/watch?v=$URL"; log "bare id → $URL"
+    else
+      fail "Not a YouTube URL: ${URL:-<empty>}"
+    fi;;
+esac
+
 [ -x "$BIN" ] || fail "binary missing: run 'go install ./cmd/youtube-helper'"
 
 # --- API key: Keychain → environment → repo .env (first hit wins).

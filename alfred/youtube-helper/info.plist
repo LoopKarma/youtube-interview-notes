@@ -61,25 +61,9 @@
 				<key>escaping</key>
 				<integer>102</integer>
 				<key>script</key>
-				<string>Q="{query}"
-[ -z "$Q" ] &amp;&amp; Q="$(pbpaste)"
-
-MODE=summary
-case "$Q" in
-  lecture\ *) MODE=lecture; Q="${Q#lecture }";;
-  summary\ *) Q="${Q#summary }";;
-esac
-
-# trim surrounding whitespace
-Q="$(printf '%s' "$Q" | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//')"
-
-case "$Q" in
-  *youtube.com/*|*youtu.be/*) ;;
-  *) /usr/bin/osascript -e 'display notification "not a YouTube URL" with title "youtube-helper"'; exit 0;;
-esac
-
-/usr/bin/osascript -e 'display notification "Summarizing… may take a few minutes" with title "youtube-helper"'
-MODE="$MODE" nohup ./summarize.sh "$Q" &gt;/dev/null 2&gt;&amp;1 &amp;
+				<string># Thin launcher: hand the raw query to the worker (cwd = workflow dir),
+# which resolves clipboard/mode/URL, validates, plays sounds and logs.
+nohup ./summarize.sh "{query}" &gt;/dev/null 2&gt;&amp;1 &amp;
 exit 0</string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
