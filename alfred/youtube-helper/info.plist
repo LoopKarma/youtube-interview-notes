@@ -61,12 +61,12 @@
 				<key>escaping</key>
 				<integer>102</integer>
 				<key>script</key>
-				<string># Thin launcher: hand the raw query to the worker (cwd = workflow dir),
+				<string># Thin launcher: hand the query arg to the worker (cwd = workflow dir),
 # which resolves clipboard/mode/URL, validates, plays sounds and logs.
-nohup ./summarize.sh "{query}" &gt;/dev/null 2&gt;&amp;1 &amp;
+nohup ./summarize.sh "$1" &gt;/dev/null 2&gt;&amp;1 &amp;
 exit 0</string>
 				<key>scriptargtype</key>
-				<integer>1</integer>
+				<integer>0</integer>
 				<key>scriptfile</key>
 				<string></string>
 				<key>type</key>

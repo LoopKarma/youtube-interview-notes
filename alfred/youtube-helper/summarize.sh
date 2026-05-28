@@ -41,7 +41,9 @@ log "start raw-input=[$RAW]"
 ding "Tink"                       # immediate audible "triggered"
 
 # --- Resolve input: arg, else clipboard. Then parse optional leading mode.
+#     Treat an unsubstituted Alfred placeholder as empty (defensive).
 INPUT="$RAW"
+[ "$INPUT" = "{query}" ] && INPUT=""
 [ -n "$INPUT" ] || { INPUT="$(pbpaste)"; log "arg empty → clipboard=[$INPUT]"; }
 case "$INPUT" in
   lecture\ *) MODE=lecture; INPUT="${INPUT#lecture }";;
