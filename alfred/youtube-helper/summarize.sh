@@ -21,18 +21,24 @@ mkdir -p "$OUT_DIR"               # always exists → result location predictabl
 
 log() { printf '%s  %s\n' "$(date '+%H:%M:%S')" "$1" >>"$LOG"; }
 
-notify() { # subtitle, message  — best-effort; logfile is the source of truth
+# ding plays a system sound. afplay needs NO notification permission, so it is
+# the one feedback channel that always works regardless of macOS settings.
+ding() { afplay "/System/Library/Sounds/$1.aiff" >/dev/null 2>&1 & }
+
+notify() { # subtitle, message, sound  — logfile is the source of truth
   log "$1: $2"
+  [ -n "${3:-}" ] && ding "$3"
   if command -v terminal-notifier >/dev/null 2>&1; then
-    terminal-notifier -title "youtube-helper" -subtitle "$1" -message "$2" >/dev/null 2>&1
+    terminal-notifier -title "youtube-helper" -subtitle "$1" -message "$2" -sound default >/dev/null 2>&1
   else
-    /usr/bin/osascript -e "display notification \"$2\" with title \"youtube-helper\" subtitle \"$1\"" >/dev/null 2>&1
+    /usr/bin/osascript -e "display notification \"$2\" with title \"youtube-helper\" subtitle \"$1\" sound name \"${3:-Glass}\"" >/dev/null 2>&1
   fi
 }
 
-fail() { notify "Failed" "$1"; log "see full log: $LOG"; open "$LOG" 2>/dev/null; exit 1; }
+fail() { notify "Failed" "$1" "Basso"; log "see full log: $LOG"; open "$LOG" 2>/dev/null; exit 1; }
 
 log "start mode=$MODE url=$URL"
+ding "Tink"                       # immediate audible "triggered"
 
 [ -n "$URL" ] || fail "no URL given"
 [ -x "$BIN" ] || fail "binary missing: run 'go install ./cmd/youtube-helper'"
@@ -54,7 +60,7 @@ if ! mkdir "$LOCK" 2>/dev/null; then
 fi
 trap 'rmdir "$LOCK" 2>/dev/null' EXIT
 
-notify "Working" "downloading + transcribing… (minutes)"
+notify "Working" "downloading + transcribing… (minutes)" "Funk"
 
 # --- Run, streaming the binary's own progress lines into the log.
 "$BIN" --output "$OUT_DIR" --mode "$MODE" "$URL" >>"$LOG" 2>&1
@@ -64,9 +70,9 @@ STATUS=$?
 
 FILE=$(sed -n 's/^Output saved to: //p' "$LOG" | tail -1)
 if [ -n "$FILE" ] && [ -f "$FILE" ]; then
+  notify "Done · opened" "$(basename "$FILE")" "Glass"
   open "$FILE"                    # last mile: pop the result open
-  notify "Done · opened" "$(basename "$FILE")"
 else
+  notify "Done" "saved to $OUT_DIR" "Glass"
   open "$OUT_DIR"
-  notify "Done" "saved to $OUT_DIR"
 fi
