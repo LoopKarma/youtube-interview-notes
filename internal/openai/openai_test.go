@@ -51,24 +51,26 @@ func TestTranscribeFile(t *testing.T) {
 }
 
 func TestChat(t *testing.T) {
-	var gotAuth string
+	var gotAuth, gotRaw string
 	var gotBody chatRequest
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "/chat/completions", r.URL.Path)
 		gotAuth = r.Header.Get("Authorization")
 		body, _ := io.ReadAll(r.Body)
+		gotRaw = string(body)
 		require.NoError(t, json.Unmarshal(body, &gotBody))
 		w.Write([]byte(`{"choices":[{"message":{"role":"assistant","content":"# result"}}]}`))
 	}))
 	defer srv.Close()
 
-	out, err := newClient(srv).Chat(context.Background(), "gpt-5-mini", "sys", "usr", 0.3)
+	out, err := newClient(srv).Chat(context.Background(), "gpt-5-mini", "sys", "usr")
 	require.NoError(t, err)
 
 	assert.Equal(t, "# result", out)
 	assert.Equal(t, "Bearer test-key", gotAuth)
 	assert.Equal(t, "gpt-5-mini", gotBody.Model)
-	assert.Equal(t, 0.3, gotBody.Temperature)
+	// gpt-5-mini rejects a non-default temperature, so we must not send one.
+	assert.NotContains(t, gotRaw, "temperature")
 	require.Len(t, gotBody.Messages, 2)
 	assert.Equal(t, "system", gotBody.Messages[0].Role)
 	assert.Equal(t, "sys", gotBody.Messages[0].Content)
@@ -81,7 +83,7 @@ func TestChat_NoChoices(t *testing.T) {
 		w.Write([]byte(`{"choices":[]}`))
 	}))
 	defer srv.Close()
-	_, err := newClient(srv).Chat(context.Background(), "m", "s", "u", 0.3)
+	_, err := newClient(srv).Chat(context.Background(), "m", "s", "u")
 	require.Error(t, err)
 }
 
@@ -91,7 +93,7 @@ func TestDo_NonSuccessStatus(t *testing.T) {
 		w.Write([]byte(`{"error":"bad key"}`))
 	}))
 	defer srv.Close()
-	_, err := newClient(srv).Chat(context.Background(), "m", "s", "u", 0.3)
+	_, err := newClient(srv).Chat(context.Background(), "m", "s", "u")
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "401")
 }

@@ -51,6 +51,23 @@ open alfred/youtube-helper.alfredworkflow
 
 Output → `~/Documents/YouTube Summaries/`, opened automatically.
 
+## Progress & troubleshooting
+
+macOS often silences `osascript` notifications (the posting app lacks notification permission), so the **logfile is the source of truth**:
+
+```bash
+tail -f "$HOME/Documents/YouTube Summaries/.last-run.log"
+```
+
+Every run truncates and rewrites it: start line, the binary's own progress, and a final `Done`/`Failed`. On failure the log is opened automatically.
+
+To get banner notifications reliably, install `terminal-notifier` (`brew install terminal-notifier`) — the worker uses it when present, else falls back to `osascript`.
+
+Common failures (all logged):
+- `OPENAI_API_KEY not in Keychain` → run the setup step 1 command.
+- `binary missing` → `go install ./cmd/youtube-helper`.
+- nothing happens at all → the worker isn't being reached; run it directly to isolate: `MODE=summary ./alfred/youtube-helper/summarize.sh "<url>"`.
+
 ## Optional extras (add in Alfred UI, no plist edits)
 
 - **Hotkey**: drag a *Hotkey* trigger onto the canvas → connect to the Run Script → bind e.g. `⌥⌘Y`.

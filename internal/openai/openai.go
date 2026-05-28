@@ -105,11 +105,12 @@ func (c *Client) TranscribeFile(ctx context.Context, path string) ([]transcriber
 	return out.Segments, nil
 }
 
-// chatRequest is the chat completions request payload.
+// chatRequest is the chat completions request payload. Temperature is
+// deliberately omitted: newer models (e.g. gpt-5-mini) reject any non-default
+// value, so we let the API apply its own default.
 type chatRequest struct {
-	Model       string        `json:"model"`
-	Messages    []chatMessage `json:"messages"`
-	Temperature float64       `json:"temperature"`
+	Model    string        `json:"model"`
+	Messages []chatMessage `json:"messages"`
 }
 
 type chatMessage struct {
@@ -126,10 +127,9 @@ type chatResponse struct {
 
 // Chat sends a system+user message pair and returns the assistant reply. It
 // satisfies summarizer.ChatClient.
-func (c *Client) Chat(ctx context.Context, model, system, user string, temperature float64) (string, error) {
+func (c *Client) Chat(ctx context.Context, model, system, user string) (string, error) {
 	payload, err := json.Marshal(chatRequest{
-		Model:       model,
-		Temperature: temperature,
+		Model: model,
 		Messages: []chatMessage{
 			{Role: "system", Content: system},
 			{Role: "user", Content: user},

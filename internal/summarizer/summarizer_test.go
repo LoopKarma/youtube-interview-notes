@@ -11,13 +11,12 @@ import (
 // fakeChat records the last call and returns canned output.
 type fakeChat struct {
 	model, system, user string
-	temperature         float64
 	reply               string
 	err                 error
 }
 
-func (f *fakeChat) Chat(_ context.Context, model, system, user string, temperature float64) (string, error) {
-	f.model, f.system, f.user, f.temperature = model, system, user, temperature
+func (f *fakeChat) Chat(_ context.Context, model, system, user string) (string, error) {
+	f.model, f.system, f.user = model, system, user
 	return f.reply, f.err
 }
 
@@ -38,7 +37,6 @@ func TestSummarize_ModeSelectsPrompt(t *testing.T) {
 			assert.Equal(t, "ok", out)
 			assert.Equal(t, tc.wantPrompt, fc.system, "system prompt must match the mode")
 			assert.Equal(t, "gpt-5-mini", fc.model)
-			assert.Equal(t, 0.3, fc.temperature)
 			assert.Contains(t, fc.user, "[00:00] hi", "transcript passed in user message")
 		})
 	}

@@ -94,7 +94,7 @@ var Prompts = map[string]string{
 // ChatClient sends a system+user prompt pair to a chat model and returns the
 // assistant's reply. The OpenAI client implements this; tests supply a fake.
 type ChatClient interface {
-	Chat(ctx context.Context, model, system, user string, temperature float64) (string, error)
+	Chat(ctx context.Context, model, system, user string) (string, error)
 }
 
 // Summarize sends the transcript to the model and returns structured markdown
@@ -105,7 +105,7 @@ func Summarize(ctx context.Context, client ChatClient, transcript, model, mode s
 		return "", fmt.Errorf("unknown mode %q", mode)
 	}
 	user := fmt.Sprintf("Here is the timestamped transcript:\n\n%s", transcript)
-	out, err := client.Chat(ctx, model, prompt, user, 0.3)
+	out, err := client.Chat(ctx, model, prompt, user)
 	if err != nil {
 		return "", fmt.Errorf("chat completion: %w", err)
 	}
