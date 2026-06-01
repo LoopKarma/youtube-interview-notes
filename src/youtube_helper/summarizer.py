@@ -110,7 +110,6 @@ def summarize_transcript(
                 "content": f"Here is the timestamped transcript:\n\n{transcript_text}",
             },
         ],
-        temperature=0.3,
     )
 
     return response.choices[0].message.content
