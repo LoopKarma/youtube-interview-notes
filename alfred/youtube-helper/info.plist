@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>bundleid</key>
+	<string>com.molov.youtube-helper</string>
+	<key>category</key>
+	<string>Productivity</string>
+	<key>connections</key>
+	<dict>
+		<key>A1000000-0000-0000-0000-000000000001</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>B2000000-0000-0000-0000-000000000002</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+	</dict>
+	<key>createdby</key>
+	<string>Evgenii Molov</string>
+	<key>description</key>
+	<string>Summarize a YouTube video with youtube-helper — runs in background, opens the markdown when done.</string>
+	<key>disabled</key>
+	<false/>
+	<key>name</key>
+	<string>youtube-helper</string>
+	<key>objects</key>
+	<array>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>argumenttype</key>
+				<integer>1</integer>
+				<key>keyword</key>
+				<string>yt</string>
+				<key>subtext</key>
+				<string>yt [lecture] &lt;url&gt;  ·  empty = clipboard</string>
+				<key>text</key>
+				<string>Summarize YouTube video</string>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.keyword</string>
+			<key>uid</key>
+			<string>A1000000-0000-0000-0000-000000000001</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>script</key>
+				<string># Thin launcher: hand the query arg to the worker (cwd = workflow dir),
+# which resolves clipboard/mode/URL, validates, plays sounds and logs.
+nohup ./summarize.sh "$1" &gt;/dev/null 2&gt;&amp;1 &amp;
+exit 0</string>
+				<key>scriptargtype</key>
+				<integer>0</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>type</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>B2000000-0000-0000-0000-000000000002</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+	</array>
+	<key>readme</key>
+	<string>Summarize YouTube videos with youtube-helper.
+
+Setup:
+1. Store key:  security add-generic-password -a "$USER" -s OPENAI_API_KEY -w "sk-..."
+2. Install binary:  go install ./cmd/youtube-helper
+3. Trigger:  type  yt &lt;url&gt;  (or copy a URL and type  yt). Add  lecture  for conspect mode:  yt lecture &lt;url&gt;.
+
+Result opens automatically when ready. Output: ~/Documents/YouTube Summaries/</string>
+	<key>uidata</key>
+	<dict>
+		<key>A1000000-0000-0000-0000-000000000001</key>
+		<dict>
+			<key>xpos</key>
+			<real>40</real>
+			<key>ypos</key>
+			<real>40</real>
+		</dict>
+		<key>B2000000-0000-0000-0000-000000000002</key>
+		<dict>
+			<key>xpos</key>
+			<real>360</real>
+			<key>ypos</key>
+			<real>90</real>
+		</dict>
+	</dict>
+	<key>version</key>
+	<string>1.0</string>
+	<key>webaddress</key>
+	<string></string>
+</dict>
+</plist>

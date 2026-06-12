@@ -1,3 +1,11 @@
+# Go
+/youtube-helper
+*.test
+*.out
+
+# Alfred packaged bundle (built via `make -C alfred pack`)
+*.alfredworkflow
+
 # Python
 __pycache__/
 *.py[cod]
